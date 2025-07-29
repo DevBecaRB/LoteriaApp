@@ -1,28 +1,36 @@
 package com.example.loteria
 
+import androidx.activity.viewModels
 import android.os.Bundle
-import android.widget.Button
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.example.loteria.databinding.ActivityMainBinding
+
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var btnGerar: Button
-    private lateinit var txtResultado: TextView
+    private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
 
-        btnGerar = findViewById(R.id.btnGerar)
-        txtResultado = findViewById(R.id.txtResultado)
+        val binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        btnGerar.setOnClickListener {
-            val numeros = (0..100).toMutableList()
-            numeros.shuffle()
-            val aleatorios = numeros.take(10).sorted()
+        setupObservers(binding)
+        setupListeners(binding)
+    }
 
-            txtResultado.text = "Seus números da sorte são:\n${aleatorios.joinToString(", ")}"
+    private fun setupObservers(binding: ActivityMainBinding) {
+        viewModel.numerosSorte.observe(this) { numeros ->
+            val texto = "Seus números da sorte são:\n${numeros.joinToString(", ")}"
+            binding.txtResultado.text = texto
+        }
+    }
+
+    private fun setupListeners(binding: ActivityMainBinding) {
+        binding.btnGerar.setOnClickListener {
+            viewModel.gerarNumeros()
         }
     }
 }
+
